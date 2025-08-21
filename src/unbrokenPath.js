@@ -302,7 +302,15 @@ const Dashboard = ({ user, userData, setLoading, setError, setCurrentView }) => 
                     </button>
                 </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                {/* NEW: Milestone System */}
+                <div className="lg:col-span-1 xl:col-span-1">
+                    <MilestoneDashboard 
+                        user={user} 
+                        userData={userData} 
+                        setError={setError}
+                    />
+                </div>
                 <div className="lg:col-span-1 bg-gray-800 p-6 rounded-2xl border border-gray-700">
                     <h3 className="text-xl font-bold mb-4">Your Identity Shield</h3>
                     <img 

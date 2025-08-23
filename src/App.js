@@ -1,5 +1,5 @@
 import React from 'react';
-import UnbrokenPathApp from './UnbrokenPath';
+import UnbrokenPathApp from './unbrokenPath';
 
 function App() {
   return <UnbrokenPathApp />;

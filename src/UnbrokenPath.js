@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { auth, db, storage } from './firebase';
 import MilestoneDashboard from './MilestoneSystem';

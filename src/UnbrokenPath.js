@@ -18,7 +18,7 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-// ---------- Helper ----------
+
 const createUserProfile = async (uid, email) => {
   const userRef = doc(db, "users", uid);
   const userSnap = await getDoc(userRef);
@@ -39,7 +39,7 @@ const createUserProfile = async (uid, email) => {
   }
 };
 
-// ---------- Small UI ----------
+
 const Spinner = () => (
   <div className="flex justify-center items-center p-4">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -91,7 +91,7 @@ const CrisisButton = () => {
   );
 };
 
-// ---------- Auth ----------
+
 const AuthComponent = ({ setUser, setLoading }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -146,7 +146,6 @@ const AuthComponent = ({ setUser, setLoading }) => {
   );
 };
 
-// ---------- Dashboard ----------
 const Dashboard = ({ user, userData, setLoading, setError, setCurrentView }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -214,7 +213,7 @@ const Dashboard = ({ user, userData, setLoading, setError, setCurrentView }) => 
   );
 };
 
-// ---------- Meeting Tile ----------
+
 const MeetingTile = ({ participant, isLocalUser }) => {
   const { avatar_likeness_url, original_photo_url, current_reveal_percent, email } = participant;
   const [isTalking, setIsTalking] = useState(false);
@@ -268,6 +267,5 @@ const MeetingTile = ({ participant, isLocalUser }) => {
   );
 };
 
-// ---------- Export ----------
 export default AuthComponent;
 export { Dashboard, MeetingTile };

@@ -1,39 +1,3 @@
-const Dashboard = ({ user, userData, setLoading, setError, setCurrentView }) => {
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-
-  const handleFileChange = (e) => setFile(e.target.files[0]);
-
-  const handleUpload = async () => {
-    if (!file) return;
-    setUploading(true);
-    try {
-      const storageRef = ref(storage, `user_photos/${user.uid}/${Date.now()}_${file.name}`);
-      const snapshot = await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(snapshot.ref);
-      await updateDoc(doc(db, "users", user.uid), {
-        original_photo_url: url,
-        photoUpdatedAt: serverTimestamp()
-      });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setUploading(false);
-      setFile(null);
-    }
-  };
-
-  const handleReveal = async (percent) => {
-    if (percent > userData.trustScore) return;
-    await updateDoc(doc(db, "users", user.uid), {
-      current_reveal_percent: percent,
-      revealUpdatedAt: serverTimestamp()
-    });
-  };
-
-  return (
-    <div className="p-6 text-white">
-      <CrisisButton />
       <div className="flex justify-between mb-6">
         <h2 className="text-2xl font-bold">Dashboard</h2>
         <button onClick={() => signOut(auth)} className="bg-gray-600 px-4 py-2 rounded">Sign Out</button>
@@ -121,4 +85,5 @@ const MeetingTile = ({ participant, isLocalUser }) => {
 
 export default AuthComponent;
 export { Dashboard, MeetingTile };
-  
+
+        

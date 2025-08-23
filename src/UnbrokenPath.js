@@ -803,3 +803,18 @@ const UnbrokenPathApp = () => {
 
 export default UnbrokenPathApp;
 ```
+style={{ 
+                        backgroundImage: `url(${original_photo_url})`,
+                        clipPath: getClipPath(current_reveal_percent)
+                    }}
+                ></div>
+            )}
+            <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                {email}
+            </div>
+        </div>
+    );
+};
+
+// 🔑 Export the main component so App.js can use it
+export default AuthComponent;

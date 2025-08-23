@@ -1,90 +1,70 @@
-      <div className="flex justify-between mb-6">
-        <h2 className="text-2xl font-bold">Dashboard</h2>
-        <button onClick={() => signOut(auth)} className="bg-gray-600 px-4 py-2 rounded">Sign Out</button>
-      </div>
-      <div className="mb-6">
-        <h3 className="font-bold mb-2">Identity Shield</h3>
-        <img src={userData.avatar_likeness_url} alt="Avatar" className="w-32 h-32 rounded-full mx-auto mb-2" />
-        <p className="text-center">{userData.email}</p>
-      </div>
-      <div>
-        <input type="file" accept="image/*" onChange={handleFileChange} className="mb-3" />
-        <button onClick={handleUpload} disabled={!file || uploading} className="bg-blue-600 px-4 py-2 rounded">
-          {uploading ? 'Uploading…' : 'Upload Photo'}
-        </button>
-      </div>
-      <div className="mt-6">
-        <h4 className="font-bold">Reveal Level</h4>
-        {[0,25,50,75,100].map(p => (
-          <button
-            key={p} onClick={() => handleReveal(p)}
-            className={`px-3 py-1 m-1 rounded ${userData.current_reveal_percent === p ? 'bg-blue-600' : 'bg-gray-700'}`}
-          >
-            {p}%
-          </button>
-        ))}
-      </div>
-      <MilestoneDashboard user={user} userData={userData} setError={setError}/>
-    </div>
-  );
+import React, { useState, useEffect } from 'react';  
+import { db } from './firebase';  
+import { doc, updateDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';  
+  
+// Milestone definitions  
+const MILESTONES = [  
+    { id: 'day1', days: 1, title: '24 Hours', emoji: '🌅', color: 'bg-yellow-500' },  
+    { id: 'week1', days: 7, title: '1 Week', emoji: '⭐', color: 'bg-blue-500' },  
+    { id: 'month1', days: 30, title: '1 Month', emoji: '🏆', color: 'bg-green-500' },  
+    { id: 'month3', days: 90, title: '3 Months', emoji: '💎', color: 'bg-purple-500' },  
+    { id: 'month6', days: 180, title: '6 Months', emoji: '👑', color: 'bg-indigo-500' },  
+    { id: 'year1', days: 365, title: '1 Year', emoji: '🎖️', color: 'bg-red-500' },  
+    { id: 'year2', days: 730, title: '2 Years', emoji: '🏅', color: 'bg-pink-500' },  
+    { id: 'year5', days: 1825, title: '5 Years', emoji: '🔥', color: 'bg-orange-500' }  
+];  
+  
+// Calculate days since sobriety date  
+const calculateDaysSober = (sobrietyDate) => {  
+    if (!sobrietyDate) return 0;  
+    const today = new Date();  
+    const soberDate = sobrietyDate.toDate ? sobrietyDate.toDate() : new Date(sobrietyDate);  
+    const diffTime = today - soberDate;  
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));  
+    return Math.max(0, diffDays);  
+};  
+  
+// Milestone Badge Component  
+const MilestoneBadge = ({ milestone, isEarned, daysSober, onCelebrate }) => {  
+    const [showCelebration, setShowCelebration] = useState(false);  
+  
+    const handleClick = () => {  
+        if (isEarned && !showCelebration) {  
+            setShowCelebration(true);  
+            onCelebrate(milestone);  
+            setTimeout(() => setShowCelebration(false), 3000);  
+        }  
+    };  
+  
+    return (  
+        <div   
+            className={`relative p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${  
+                isEarned   
+                    ? `${milestone.color} border-white shadow-lg hover:scale-105`   
+                    : 'bg-gray-700 border-gray-600 opacity-50'  
+            }`}  
+            onClick={handleClick}  
+        >  
+            <div className="text-center">  
+                <div className="text-4xl mb-2">{milestone.emoji}</div>  
+                <h3 className="font-bold text-white">{milestone.title}</h3>  
+                <p className="text-xs text-gray-200">{milestone.days} days</p>  
+                {isEarned && (  
+                    <div className="mt-2 text-xs text-green-200">  
+                        ✅ Earned!  
+                    </div>  
+                )}  
+            </div>  
+              
+            {showCelebration && (  
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 rounded-2xl">  
+                    <div className="text-center animate-bounce">  
+                        <div className="text-6xl mb-2">🎉</div>  
+                        <p className="text-white font-bold">Congratulations!</p>  
+                        <p className="text-gray-300 text-sm">{milestone.title} milestone!</p>  
+                    </div>  
+                </div>  
+            )}  
+        </div>  
+    );  
 };
-
-
-const MeetingTile = ({ participant, isLocalUser }) => {
-  const { avatar_likeness_url, original_photo_url, current_reveal_percent, email } = participant;
-  const [isTalking, setIsTalking] = useState(false);
-
-  useEffect(() => {
-    let audioContext, analyser, source, id;
-    if (isLocalUser && navigator.mediaDevices) {
-      navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-        audioContext = new AudioContext();
-        analyser = audioContext.createAnalyser();
-        source = audioContext.createMediaStreamSource(stream);
-        source.connect(analyser);
-        analyser.fftSize = 32;
-        const data = new Uint8Array(analyser.frequencyBinCount);
-        const detect = () => {
-          analyser.getByteFrequencyData(data);
-          const avg = data.reduce((a,b)=>a+b)/data.length;
-          setIsTalking(avg > 20);
-          id = requestAnimationFrame(detect);
-        };
-        detect();
-      });
-    }
-    return () => {
-      if (id) cancelAnimationFrame(id);
-      if (audioContext) audioContext.close();
-    };
-  }, [isLocalUser]);
-
-  const getClipPath = (p) => {
-    switch (p) {
-      case 25: return 'inset(50% 0 0 50%)';
-      case 50: return 'inset(50% 0 0 0)';
-      case 75: return 'inset(0 0 0 50%)';
-      case 100: return 'inset(0 0 0 0)';
-      default: return 'inset(100%)';
-    }
-  };
-
-  return (
-    <div className={`relative aspect-square rounded-xl overflow-hidden border-4 ${isTalking ? 'border-green-400' : 'border-gray-600'}`}>
-      <img src={avatar_likeness_url} alt="Avatar" className="w-full h-full object-cover" />
-      {current_reveal_percent > 0 && original_photo_url && (
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${original_photo_url})`, clipPath: getClipPath(current_reveal_percent) }}
-        ></div>
-      )}
-      <div className="absolute bottom-2 left-2 bg-black/50 text-white text-xs px-2 py-1 rounded">{email}</div>
-    </div>
-  );
-};
-
-export default AuthComponent;
-export { Dashboard, MeetingTile };
-
-
-            

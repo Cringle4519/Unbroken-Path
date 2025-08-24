@@ -1,4 +1,6 @@
-// src/UnbrokenPath.js
+import { useEffect, useState } from "react";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./firebaseClient";// src/UnbrokenPath.js
 import React, { useEffect, useRef, useState } from 'react';
 import { auth, db, storage } from './firebase';
 import MilestoneDashboard from './MilestoneSystem';

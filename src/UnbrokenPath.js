@@ -1,5 +1,5 @@
 // src/UnbrokenPath.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { auth, db, storage } from './firebase';
 import MilestoneDashboard from './MilestoneSystem';
 
@@ -14,10 +14,10 @@ import {
   doc,
   setDoc,
   getDoc,
-  onSnapshot,
-  updateDoc,
   collection,
   addDoc,
+  onSnapshot,
+  updateDoc,
   serverTimestamp,
 } from 'firebase/firestore';
 
@@ -31,7 +31,7 @@ async function createUserProfile(uid, email) {
     await setDoc(userRef, {
       email,
       trustScore: 25,
-      avatar_likeness_url: '',
+      avatar_likeness_url: `https://placehold.co/400x400/1a202c/ffffff?text=${email.charAt(0).toUpperCase()}`,
       original_photo_url: '',
       current_reveal_percent: 0,
       sobrietyDate: null,
@@ -45,49 +45,17 @@ async function createUserProfile(uid, email) {
 
 function Spinner() {
   return (
-    <div style={{ padding: 16, display: 'flex', justifyContent: 'center' }}>
-      <div
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: '50%',
-          border: '3px solid #3B82F6',
-          borderTopColor: 'transparent',
-          animation: 'spin 1s linear infinite',
-        }}
-      />
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    <div className="flex justify-center items-center p-4">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
     </div>
   );
 }
 
 function Modal({ children, onClose }) {
   return (
-    <div
-      onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0,0,0,.6)',
-        zIndex: 50,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          background: '#1f2937',
-          color: '#fff',
-          borderRadius: 16,
-          padding: 24,
-          maxWidth: 480,
-          width: '100%',
-          border: '1px solid #374151',
-        }}
-      >
+    <div className="fixed inset-0 bg-black/60 z-50 flex justify-center items-center p-4">
+      <div className="bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8 w-full max-w-md relative border border-gray-700">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white">✕</button>
         {children}
       </div>
     </div>
@@ -100,44 +68,29 @@ function CrisisButton() {
     { name: '988 Suicide & Crisis Lifeline', number: '988', hours: '24/7' },
     { name: 'Crisis Text Line', number: 'Text HOME to 741741', hours: '24/7' },
     { name: 'SAMHSA National Helpline', number: '1-800-662-4357', hours: '24/7' },
-    { name: 'National Domestic Violence Hotline', number: '1-800-799-7233', hours: '24/7' },
+    { name: 'Domestic Violence Hotline', number: '1-800-799-7233', hours: '24/7' },
   ];
-
   return (
     <>
       <button
         onClick={() => setOpen(true)}
-        style={{
-          position: 'fixed',
-          top: 12,
-          right: 12,
-          zIndex: 60,
-          background: '#dc2626',
-          color: '#fff',
-          fontWeight: 700,
-          borderRadius: 999,
-          padding: '8px 14px',
-          border: 'none',
-        }}
+        className="fixed top-4 right-4 z-40 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-lg"
       >
         🆘 Crisis Help
       </button>
-
       {open && (
         <Modal onClose={() => setOpen(false)}>
-          <h2 style={{ marginTop: 0, marginBottom: 8, fontSize: 20, color: '#fca5a5', textAlign: 'center' }}>
-            Crisis Resources
-          </h2>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          <h2 className="text-2xl font-bold text-red-400 mb-4 text-center">Crisis Resources</h2>
+          <div className="space-y-3">
             {resources.map((r) => (
-              <li key={r.name} style={{ margin: '10px 0', background: '#111827', padding: 12, borderRadius: 10 }}>
-                <div style={{ fontWeight: 700 }}>{r.name}</div>
-                <div style={{ marginTop: 4 }}>{r.number}</div>
-                <div style={{ marginTop: 2, fontSize: 12, color: '#9ca3af' }}>{r.hours}</div>
-              </li>
+              <div key={r.name} className="bg-gray-700 p-4 rounded-lg">
+                <div className="font-semibold text-white">{r.name}</div>
+                <div className="text-blue-300 font-bold">{r.number}</div>
+                <div className="text-gray-400 text-sm">{r.hours}</div>
+              </div>
             ))}
-          </ul>
-          <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 12, textAlign: 'center' }}>
+          </div>
+          <p className="text-gray-400 text-sm mt-6 text-center">
             If you’re in immediate danger, call 911.
           </p>
         </Modal>
@@ -169,125 +122,50 @@ function Auth({ setLoading }) {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: '#111827',
-        color: '#fff',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-      }}
-    >
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col justify-center items-center p-4">
       <CrisisButton />
-      <form
-        onSubmit={submit}
-        style={{
-          width: '100%',
-          maxWidth: 420,
-          background: '#1f2937',
-          borderRadius: 16,
-          padding: 24,
-          border: '1px solid #374151',
-        }}
-      >
-        <h1 style={{ marginTop: 0, textAlign: 'center' }}>Unbroken Path</h1>
-        {err && (
-          <div
-            style={{
-              background: '#7f1d1d',
-              color: '#fecaca',
-              padding: 10,
-              borderRadius: 8,
-              marginBottom: 12,
-            }}
-          >
-            {err}
-          </div>
-        )}
-        <label>Email</label>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            width: '100%',
-            margin: '6px 0 12px',
-            padding: 10,
-            borderRadius: 8,
-            border: '1px solid #374151',
-            background: '#111827',
-            color: '#fff',
-          }}
-        />
-        <label>Password</label>
-        <input
-          type="password"
-          required
-          value={pw}
-          onChange={(e) => setPw(e.target.value)}
-          style={{
-            width: '100%',
-            margin: '6px 0 16px',
-            padding: 10,
-            borderRadius: 8,
-            border: '1px solid #374151',
-            background: '#111827',
-            color: '#fff',
-          }}
-        />
-        <button
-          type="submit"
-          style={{
-            width: '100%',
-            padding: 12,
-            borderRadius: 10,
-            border: 'none',
-            fontWeight: 700,
-            background: '#2563eb',
-            color: '#fff',
-          }}
-        >
-          {signup ? 'Sign Up' : 'Log In'}
-        </button>
-        <button
-          type="button"
-          onClick={() => setSignup((v) => !v)}
-          style={{
-            marginTop: 10,
-            width: '100%',
-            padding: 10,
-            borderRadius: 10,
-            border: '1px solid #374151',
-            background: 'transparent',
-            color: '#cbd5e1',
-          }}
-        >
+      <div className="w-full max-w-md bg-gray-800 p-8 rounded-2xl border border-gray-700">
+        <h1 className="text-3xl font-bold text-center mb-6">Unbroken Path</h1>
+        {err && <p className="bg-red-500/20 text-red-300 p-3 rounded-lg mb-4 text-center">{err}</p>}
+        <form onSubmit={submit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full p-3 bg-gray-700 rounded-lg border border-gray-600"
+            value={pw}
+            onChange={(e) => setPw(e.target.value)}
+            required
+          />
+          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg">
+            {signup ? 'Sign Up' : 'Log In'}
+          </button>
+        </form>
+        <button className="w-full mt-4 text-gray-400 hover:text-white" onClick={() => setSignup(!signup)}>
           {signup ? 'Already have an account? Log In' : 'Need an account? Sign Up'}
         </button>
-      </form>
+      </div>
     </div>
   );
 }
 
 // ---------- dashboard ----------
-function Dashboard({ user, userData, setError }) {
+function Dashboard({ user, userData, setError, setLoading, setView }) {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
   function onPick(e) {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (!f.type.startsWith('image/')) {
-      setError('Please select an image file.');
-      return;
-    }
-    if (f.size > 5 * 1024 * 1024) {
-      setError('Max file size is 5MB.');
-      return;
-    }
+    if (!f.type.startsWith('image/')) return setError('Please select an image file.');
+    if (f.size > 5 * 1024 * 1024) return setError('Max file size is 5MB.');
     setError('');
     setFile(f);
   }
@@ -300,13 +178,11 @@ function Dashboard({ user, userData, setError }) {
       const path = `user_photos/${user.uid}/${Date.now()}_${file.name}`;
       const snap = await uploadBytes(ref(storage, path), file, { contentType: file.type });
       const url = await getDownloadURL(snap.ref);
-
       await updateDoc(doc(db, 'users', user.uid), {
         original_photo_url: url,
-        // leave avatar empty unless you set it elsewhere on purpose
+        avatar_likeness_url: userData?.avatar_likeness_url || url,
         photoUpdatedAt: serverTimestamp(),
       });
-
       await addDoc(collection(db, 'consent_log'), {
         userId: user.uid,
         action: 'photo_upload',
@@ -323,147 +199,115 @@ function Dashboard({ user, userData, setError }) {
   }
 
   return (
-    <div style={{ padding: 16, color: '#fff' }}>
+    <div className="p-4 md:p-8 text-white">
       <CrisisButton />
-      <div
-        style={{
-          display: 'grid',
-          gap: 16,
-          gridTemplateColumns: '1fr 1fr',
-          alignItems: 'start',
-        }}
-      >
-        <div style={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 16, padding: 16 }}>
-          <h3 style={{ marginTop: 0 }}>Your Identity</h3>
-
-          {/* Only render image if you actually have a URL */}
-          {userData?.avatar_likeness_url ? (
-            <img
-              alt="Avatar"
-              src={userData.avatar_likeness_url}
-              style={{
-                width: 160,
-                height: 160,
-                borderRadius: '50%',
-                display: 'block',
-                margin: '0 auto 12px',
-                objectFit: 'cover',
-                border: '4px solid #374151',
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 160,
-                height: 160,
-                borderRadius: '50%',
-                display: 'block',
-                margin: '0 auto 12px',
-                border: '2px dashed #374151',
-                color: '#9ca3af',
-                alignItems: 'center',
-                justifyContent: 'center',
-                display: 'flex',
-                fontSize: 12,
-              }}
-            >
-              No avatar yet
-            </div>
-          )}
-
-          <p style={{ textAlign: 'center', color: '#cbd5e1' }}>{userData?.email || user?.email}</p>
-          <p style={{ textAlign: 'center', color: '#94a3b8' }}>
-            User ID: <code>{user.uid}</code>
-          </p>
-
-          <input type="file" accept="image/*" onChange={onPick} />
-          <button
-            onClick={upload}
-            disabled={!file || uploading}
-            style={{
-              marginTop: 12,
-              width: '100%',
-              padding: 10,
-              borderRadius: 8,
-              border: 'none',
-              fontWeight: 700,
-              background: uploading ? '#6b7280' : '#2563eb',
-              color: '#fff',
-              cursor: uploading ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {uploading ? 'Uploading…' : 'Upload Photo'}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold">Your Dashboard</h2>
+        <div className="space-x-4">
+          <button onClick={() => setView('meeting')} className="bg-green-600 hover:bg-green-700 py-2 px-6 rounded-lg">
+            Join Meeting
           </button>
-        </div>
-
-        <div style={{ background: '#1f2937', border: '1px solid #374151', borderRadius: 16, padding: 16 }}>
-          <MilestoneDashboard user={user} userData={userData} setError={setError} />
+          <button onClick={() => signOut(auth)} className="bg-gray-600 hover:bg-gray-700 py-2 px-4 rounded-lg">
+            Sign Out
+          </button>
         </div>
       </div>
 
-      <div style={{ marginTop: 20, textAlign: 'right' }}>
-        <button
-          onClick={() => signOut(auth)}
-          style={{
-            padding: '8px 12px',
-            borderRadius: 8,
-            border: 'none',
-            background: '#4b5563',
-            color: '#fff',
-            fontWeight: 700,
-          }}
-        >
-          Sign Out
-        </button>
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="lg:col-span-1">
+          <MilestoneDashboard user={user} userData={userData} setError={setError} />
+        </div>
+
+        <div className="lg:col-span-1 bg-gray-800 p-6 rounded-2xl border border-gray-700">
+          <h3 className="text-xl font-bold mb-4">Your Identity Shield</h3>
+          <img
+            src={userData?.avatar_likeness_url || 'https://placehold.co/256x256'}
+            alt="Avatar"
+            className="w-48 h-48 rounded-full mx-auto mb-4 border-4 border-gray-700"
+          />
+          <p className="text-center text-gray-400 mb-4">{userData?.email || user?.email}</p>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={onPick}
+            className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:font-semibold file:bg-blue-500/10 file:text-blue-300"
+          />
+          <button
+            onClick={upload}
+            disabled={!file || uploading}
+            className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg disabled:bg-gray-600"
+          >
+            {uploading ? <Spinner /> : 'Upload & Generate Avatar'}
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-// ---------- root ----------
+// ---------- meeting (lightweight) ----------
+function MeetingTile({ participant }) {
+  const { avatar_likeness_url, email } = participant;
+  const [talking] = useState(false); // simple placeholder UI state
+  return (
+    <div className={`relative aspect-square bg-gray-700 rounded-2xl overflow-hidden border-4 ${talking ? 'border-green-400' : 'border-gray-600'}`}>
+      <img src={avatar_likeness_url || 'https://placehold.co/600x600'} alt={email} className="w-full h-full object-cover" />
+      <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white p-2 text-xs truncate">{email}</div>
+    </div>
+  );
+}
+
+function MeetingView({ user, setView }) {
+  const participants = [
+    { email: user?.email || 'you@example.com', avatar_likeness_url: 'https://placehold.co/300x300' },
+  ];
+  return (
+    <div className="p-4 md:p-8 text-white">
+      <button onClick={() => setView('dashboard')} className="mb-4 bg-gray-700 hover:bg-gray-600 py-2 px-4 rounded-lg">
+        ← Back to Dashboard
+      </button>
+      <h2 className="text-2xl font-bold mb-4">Meeting</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {participants.map((p) => <MeetingTile key={p.email} participant={p} />)}
+      </div>
+    </div>
+  );
+}
+
+// ---------- root component ----------
 export default function UnbrokenPathApp() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [view, setView] = useState('dashboard'); // 'dashboard' | 'meeting'
   const [error, setError] = useState('');
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
-      if (!u) {
+      if (u) {
+        const refUser = doc(db, 'users', u.uid);
+        const snap = await getDoc(refUser);
+        if (snap.exists()) setUserData({ uid: u.uid, email: u.email, ...snap.data() });
+        else setUserData({ uid: u.uid, email: u.email });
+      } else {
         setUserData(null);
-        setLoading(false);
-        return;
       }
-      const userRef = doc(db, 'users', u.uid);
-      const stop = onSnapshot(userRef, (snap) => {
-        setUserData(snap.data() || { email: u.email });
-        setLoading(false);
-      });
-      return () => stop();
+      setLoading(false);
     });
     return () => unsub();
   }, []);
 
-  if (loading) return <Spinner />;
+  if (loading) return <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center"><Spinner /></div>;
   if (!user) return <Auth setLoading={setLoading} />;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#111827', color: '#fff' }}>
-      {error && (
-        <div
-          style={{
-            background: '#7f1d1d',
-            color: '#fecaca',
-            padding: 10,
-            borderRadius: 8,
-            margin: 16,
-          }}
-        >
-          {error}
-        </div>
-      )}
-      <Dashboard user={user} userData={userData || {}} setError={setError} />
+    <div className="min-h-screen bg-gray-900 text-white">
+ 
+     {error && <div className="bg-red-600 text-white p-3 text-center">{error}</div>}
+      {view === 'dashboard'
+        ? <Dashboard user={user} userData={userData} setError={setError} setLoading={setLoading} setView={setView} />
+        : <MeetingView user={user} setView={setView} />}
     </div>
   );
-}
+    }

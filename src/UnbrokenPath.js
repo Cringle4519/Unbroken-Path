@@ -303,11 +303,10 @@ export default function UnbrokenPathApp() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
- 
-     {error && <div className="bg-red-600 text-white p-3 text-center">{error}</div>}
+      {error && <div className="bg-red-600 text-white p-3 text-center">{error}</div>}
       {view === 'dashboard'
         ? <Dashboard user={user} userData={userData} setError={setError} setLoading={setLoading} setView={setView} />
         : <MeetingView user={user} setView={setView} />}
     </div>
   );
-    }
+  }

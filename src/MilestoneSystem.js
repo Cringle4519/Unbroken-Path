@@ -1,4 +1,4 @@
-
+// src/MilestoneSystem.js
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { doc, updateDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
@@ -69,9 +69,6 @@ const MilestoneBadge = ({ milestone, isEarned, daysSober, onCelebrate }) => {
         </div>
     );
 };
-```
-
-```javascript
 
 // Progress Ring Component
 const ProgressRing = ({ daysSober, nextMilestone }) => {
@@ -286,4 +283,3 @@ const MilestoneDashboard = ({ user, userData, setError }) => {
 };
 
 export default MilestoneDashboard;
-```  

@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import TrustBadge from '../components/TrustBadge.jsx'
-import { nextTrustScore } from '../utils/trustScoreEngine.js'
-
+import { nextTrustScore } from '../utils/trustScoreEngine.js
 export default function Dashboard() {
   const [score, setScore] = useState(42)
   const [actions, setActions] = useState({ daysClean: 47, helpfulVotes: 5, reports: 0, infractions: 0 })

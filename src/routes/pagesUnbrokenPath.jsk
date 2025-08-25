@@ -1,0 +1,41 @@
+import React from 'react'
+import RevealViewer from '../components/RevealViewer.jsx'
+
+export default function UnbrokenPath() {
+  return (
+    <div className="stack">
+      <section className="card">
+        <h1 className="h">Unbroken Path</h1>
+        <p className="sub">Recovery groups with privacy-first identity reveal powered by PIRP (IronWall).</p>
+        <div className="row">
+          <span className="badge">PIRP</span>
+          <span className="pill">0% → 25% → 50% → 75% → 100%</span>
+          <span className="pill">Trust Score ↗ unlocks identity</span>
+        </div>
+      </section>
+
+      <section className="two">
+        <div className="card">
+          <h3 className="h" style={{fontSize:22}}>Live Reveal Demo</h3>
+          <p className="sub">This demo shows how squares of the real image unlock as trust increases. Replace the image URLs with your assets.</p>
+          <RevealViewer
+            avatarUrl="https://picsum.photos/seed/avatar/640/480"
+            realImageUrl="https://picsum.photos/seed/real/640/480"
+            trustScore={68}
+            gridSize={8}
+          />
+        </div>
+        <div className="card">
+          <h3 className="h" style={{fontSize:22}}>How it works</h3>
+          <ul>
+            <li>0–24: only avatar likeness is shown.</li>
+            <li>25–49: 25% of squares uncover real image.</li>
+            <li>50–74: 50% uncover.</li>
+            <li>75–99: 75% uncover.</li>
+            <li>100: full reveal.</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  )
+}

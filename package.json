@@ -1,20 +1,31 @@
 {
-  "name": "your-project-name",
+  "name": "your-react-app",
   "version": "1.0.0",
-  "description": "A Node.js project configured for Node 20.x.",
+  "description": "A basic React application.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "engines": {
-    "node": ">=20.0.0"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "react-scripts": "5.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

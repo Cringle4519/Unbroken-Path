@@ -1,27 +1,20 @@
 {
-  "name": "unbroken-path",
+  "name": "your-project-name",
   "version": "1.0.0",
-  "private": true,
-  "engines": {
-    "node": "22.x"
-  },
-  "homepage": ".",
+  "description": "A Node.js project configured for Node 20.x.",
+  "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.0.0"
   },
   "dependencies": {
-    "firebase": "^10.12.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.24.1"
+    "express": "^4.19.2"
   },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "vite": "^5.3.4",
-    "tailwindcss": "^3.4.10",
-    "postcss": "^8.4.41",
-    "autoprefixer": "^10.4.20"
-  }
+  "devDependencies": {}
 }

@@ -1,6 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
+
+function App() {
+  return (
+    <div style={{ padding: "2rem", fontFamily: "system-ui" }}>
+      <h1>Unbroken Path</h1>
+      <p>Welcome — this is your working site, not a blank page.</p>
+      <nav style={{ marginTop: "1rem" }}>
+        <a href="#groups" style={{ marginRight: "1rem" }}>Groups</a>
+        <a href="#meetings" style={{ marginRight: "1rem" }}>Meetings</a>
+        <a href="#profile">Profile</a>
+      </nav>
+    </div>
+  );
+}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

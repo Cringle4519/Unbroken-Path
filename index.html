@@ -10,3 +10,32 @@
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
+<div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- 👇 Add this, do not delete other code -->
+    <script>
+      (function () {
+        function show(msg) {
+          var box = document.getElementById('errbox');
+          if (!box) {
+            box = document.createElement('pre');
+            box.id = 'errbox';
+            box.style.cssText =
+              'position:fixed;left:8px;right:8px;bottom:8px;max-height:50vh;overflow:auto;' +
+              'background:#1f2937;color:#fca5a5;border:2px solid #ef4444;border-radius:10px;' +
+              'padding:10px;font:12px/1.4 system-ui,monospace;z-index:999999;';
+            document.body.appendChild(box);
+          }
+          box.textContent = msg + '\n\n(If this shows, copy it here.)';
+        }
+        window.addEventListener('error', function (e) {
+          show('ERROR: ' + e.message + '\n' + (e.filename||'') + ':' + (e.lineno||'') + ':' + (e.colno||''));
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          show('PROMISE ERROR: ' + (e.reason && (e.reason.stack || e.reason.message || e.reason)));
+        });
+      })();
+    </script>
+  </body>
+</html>

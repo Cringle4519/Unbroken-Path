@@ -1,41 +1,362 @@
-<!doctype html>
+<!-- index.html -->
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Unbroken Path</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
-<div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Unbroken-Path</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #0d1117; }
+    .bg-pattern {
+      background-image: radial-gradient(circle, rgba(29,39,51,.8) 0%, rgba(13,17,23,0) 70%),
+                       url('data:image/svg+xml,%3Csvg width="6" height="6" viewBox="0 0 6 6" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%232c3e50" fill-opacity="0.1" fill-rule="evenodd"%3E%3Cpath d="M5 0h1L0 6V5zM6 5v1H5z"/%3E%3C/g%3E%3C/svg%3E');
+      background-repeat: repeat;
+    }
+    .card-glow { box-shadow: 0 0 15px rgba(118,163,224,.1), 0 0 5px rgba(118,163,224,.2); transition: transform .2s; }
+    .card-glow:hover { transform: translateY(-2px); }
+    .animate-fade-in { animation: fade-in .8s ease-out forwards; }
+    @keyframes fade-in { from {opacity:0; transform: translateY(20px);} to {opacity:1; transform: translateY(0);} }
+    .chat-message { max-width: 85%; word-wrap: break-word; }
+    .trust-avatar-container {
+      position:relative; width:150px; height:150px; background:#2c3e50; border-radius:50%; overflow:hidden;
+      border:3px solid; box-shadow:0 0 20px rgba(78,107,143,.4);
+    }
+    .trust-fill { position:absolute; bottom:0; left:0; width:100%; transition:height .5s, background-color .5s; }
+    .chat-scroll { scrollbar-width: thin; scrollbar-color:#4a5568 #1a202c; }
+    .chat-scroll::-webkit-scrollbar { width:8px; }
+    .chat-scroll::-webkit-scrollbar-track { background:#1a202c; }
+    .chat-scroll::-webkit-scrollbar-thumb { background-color: #4a5568; border-radius:20px; border:2px solid #1a202c; }
 
-    <!-- 👇 Add this, do not delete other code -->
-    <script>
-      (function () {
-        function show(msg) {
-          var box = document.getElementById('errbox');
-          if (!box) {
-            box = document.createElement('pre');
-            box.id = 'errbox';
-            box.style.cssText =
-              'position:fixed;left:8px;right:8px;bottom:8px;max-height:50vh;overflow:auto;' +
-              'background:#1f2937;color:#fca5a5;border:2px solid #ef4444;border-radius:10px;' +
-              'padding:10px;font:12px/1.4 system-ui,monospace;z-index:999999;';
-            document.body.appendChild(box);
-          }
-          box.textContent = msg + '\n\n(If this shows, copy it here.)';
-        }
-        window.addEventListener('error', function (e) {
-          show('ERROR: ' + e.message + '\n' + (e.filename||'') + ':' + (e.lineno||'') + ':' + (e.colno||''));
-        });
-        window.addEventListener('unhandledrejection', function (e) {
-          show('PROMISE ERROR: ' + (e.reason && (e.reason.stack || e.reason.message || e.reason)));
-        });
-      })();
-    </script>
-  </body>
-</html>
+    /* tiny utility aliases so we're not repeating long class lists everywhere */
+    .nav-button { display:flex; align-items:center; gap:.5rem; padding:.5rem 1rem; border-radius:9999px; color:#cbd5e1; }
+    .nav-button:hover { color:#a5b4fc; }
+    .form-input { width:100%; padding:.75rem; background:#374151; color:white; border-radius:.75rem; outline:none; }
+    .form-input:focus { box-shadow: 0 0 0 2px #6366f1; }
+    .form-button { width:100%; color:white; font-weight:600; padding:.75rem 1rem; border-radius: .75rem; box-shadow: 0 4px 10px rgba(0,0,0,.25); }
+    .action-button { color:white; font-weight:600; padding:.5rem 1rem; border-radius:9999px; }
+  </style>
+</head>
+<body class="bg-gray-950 flex items-center justify-center min-h-screen p-4 text-gray-100 bg-pattern">
+  <div id="app" class="w-full max-w-4xl bg-[#131a22] shadow-2xl rounded-3xl p-6 md:p-10 space-y-8 card-glow">
+    <!-- Navigation -->
+    <nav class="flex justify-center space-x-4 mb-6">
+      <button id="nav-meetings" class="nav-button group">
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h.01M7 16h.01M11 16h.01M15 16h.01M17 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg><span>Meetings</span>
+      </button>
+      <button id="nav-groups" class="nav-button group">
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 20v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M7 11a4 4 0 110-8 4 4 0 010 8zm10 0a4 4 0 110-8 4 4 0 010 8zm-2 10v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+        </svg><span>Groups</span>
+      </button>
+      <button id="nav-profile" class="nav-button group">
+        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg><span>Profile</span>
+      </button>
+    </nav>
+
+    <h1 class="text-3xl font-bold text-white text-center mb-6">Unbroken-Path</h1>
+
+    <!-- View Containers -->
+    <div id="loading" class="text-center text-gray-500 text-lg">Initializing...</div>
+    <div id="meetings-view" class="hidden animate-fade-in"></div>
+    <div id="groups-view" class="hidden animate-fade-in"></div>
+    <div id="profile-view" class="hidden animate-fade-in"></div>
+    <div id="chat-view" class="hidden animate-fade-in"></div>
+  </div>
+
+  <!-- Firebase + App -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { setLogLevel } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Provided by the embedding environment (if present)
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+    const auth = getAuth(app);
+    setLogLevel('debug');
+
+    // DOM
+    const navButtons  = document.querySelectorAll('.nav-button');
+    const meetingsView = document.getElementById('meetings-view');
+    const groupsView   = document.getElementById('groups-view');
+    const profileView  = document.getElementById('profile-view');
+    const chatView     = document.getElementById('chat-view');
+    const loadingDiv   = document.getElementById('loading');
+
+    // App state
+    const appState = {
+      userId: null,
+      activeView: 'meetings',
+      isAuthReady: false,
+      userProfile: null,
+      meetings: [],
+      groups: [],
+      selectedChatId: null,
+      selectedChatType: null,
+      editingMeetingId: null,
+      editingGroupId: null,
+      debouncedSearch: null,
+      unsubMeetings: null,
+      unsubGroups: null,
+      unsubProfile: null,
+    };
+
+    // Utils
+    const showView = (view) => {
+      const views = { meetings: meetingsView, groups: groupsView, profile: profileView, chat: chatView, loading: loadingDiv };
+      Object.values(views).forEach(v => v.classList.add('hidden'));
+      views[view].classList.remove('hidden');
+
+      navButtons.forEach(btn => btn.classList.remove('bg-indigo-600','text-white'));
+      const activeNavBtn = document.getElementById(\`nav-\${view}\`);
+      if (activeNavBtn) activeNavBtn.classList.add('bg-indigo-600','text-white');
+
+      appState.activeView = view;
+    };
+
+    const debounce = (fn, delay) => {
+      let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+    };
+
+    // --- Search handler (debounced) ---
+    const handleSearch = (e) => {
+      const q = (e?.target?.value || '').toLowerCase();
+      if (appState.activeView === 'meetings') {
+        const filtered = appState.meetings.filter(m => (m.title||'').toLowerCase().includes(q));
+        renderMeetings(filtered, e.target.value);
+      } else if (appState.activeView === 'groups') {
+        const filtered = appState.groups.filter(g =>
+          (g.name||'').toLowerCase().includes(q) || (g.description||'').toLowerCase().includes(q)
+        );
+        renderGroups(filtered, e.target.value);
+      }
+    };
+    appState.debouncedSearch = debounce(handleSearch, 200);
+
+    // --- Meetings view ---
+    function renderMeetings(filteredMeetings = appState.meetings, searchQuery = '') {
+      const meetingToEdit = appState.editingMeetingId ? appState.meetings.find(m => m.id === appState.editingMeetingId) : null;
+      meetingsView.innerHTML = `
+        <div class="space-y-6">
+          <h2 class="text-2xl font-semibold text-white text-center">Upcoming Meetings</h2>
+          <div id="meeting-form" class="bg-[#1b2530] p-6 rounded-2xl shadow-inner space-y-4">
+            <h3 class="text-xl font-semibold text-gray-200">${appState.editingMeetingId ? 'Edit Meeting' : 'Schedule a Meeting'}</h3>
+            <input id="meeting-title" class="form-input" type="text" placeholder="Meeting Title" value="${meetingToEdit?.title || ''}">
+            <input id="meeting-date"  class="form-input" type="date" value="${meetingToEdit?.date || ''}">
+            <input id="meeting-time"  class="form-input" type="time" value="${meetingToEdit?.time || ''}">
+            <button id="save-meeting-btn" class="form-button bg-green-600 hover:bg-green-700" data-action="${appState.editingMeetingId ? 'update' : 'add'}">${appState.editingMeetingId ? 'Update' : 'Save'}</button>
+            ${appState.editingMeetingId ? '<button id="cancel-edit-btn" class="form-button bg-gray-600 hover:bg-gray-700">Cancel</button>' : ''}
+          </div>
+          <input id="search-meetings" class="form-input" type="text" placeholder="Search meetings..." value="${searchQuery}">
+          <div id="meetings-list" class="space-y-4">
+            ${filteredMeetings.length === 0 ? '<p class="text-gray-500 text-center mt-4">No meetings scheduled. Add one above!</p>' : ''}
+          </div>
+        </div>
+      `;
+      const list = meetingsView.querySelector('#meetings-list');
+      filteredMeetings.forEach(meeting => {
+        const card = document.createElement('div');
+        card.className = 'bg-[#1b2530] p-4 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center card-glow';
+        card.innerHTML = `
+          <div class="mb-2 sm:mb-0 text-center sm:text-left">
+            <h3 class="font-bold text-gray-100">${meeting.title}</h3>
+            <p class="text-sm text-gray-400">Date: ${meeting.date || ''}</p>
+            <p class="text-sm text-gray-400">Time: ${meeting.time || ''}</p>
+          </div>
+          <div class="flex space-x-2">
+            <button data-id="${meeting.id}" class="action-button edit-meeting-btn bg-yellow-600 hover:bg-yellow-700">Edit</button>
+            <button data-id="${meeting.id}" class="action-button join-meeting-btn bg-indigo-600 hover:bg-indigo-700">Join</button>
+            <button data-id="${meeting.id}" class="action-button delete-meeting-btn bg-red-600 hover:bg-red-700">Delete</button>
+          </div>`;
+        list.appendChild(card);
+      });
+      meetingsView.querySelector('#search-meetings').addEventListener('input', appState.debouncedSearch);
+      meetingsView.querySelector('#meeting-form').addEventListener('click', handleMeetingFormClick);
+      meetingsView.querySelector('#meetings-list').addEventListener('click', handleMeetingListClick);
+    }
+
+    function handleMeetingFormClick(e) {
+      const btn = e.target.closest('#save-meeting-btn, #cancel-edit-btn');
+      if (!btn) return;
+
+      if (btn.id === 'cancel-edit-btn') {
+        appState.editingMeetingId = null;
+        renderMeetings();
+        return;
+      }
+
+      const title = document.getElementById('meeting-title').value.trim();
+      const date  = document.getElementById('meeting-date').value;
+      const time  = document.getElementById('meeting-time').value;
+
+      if (!title) return alert('Please enter a meeting title.');
+
+      const col = collection(db, `artifacts/${appId}/public/data/meetings`);
+      if (btn.dataset.action === 'update' && appState.editingMeetingId) {
+        const ref = doc(db, `artifacts/${appId}/public/data/meetings`, appState.editingMeetingId);
+        setDoc(ref, { title, date, time, updatedBy: appState.userId, updatedAt: Date.now() }, { merge: true })
+          .then(() => { appState.editingMeetingId = null; })
+          .catch(err => console.error('Update meeting error:', err));
+      } else {
+        addDoc(col, { title, date, time, createdBy: appState.userId, createdAt: Date.now() })
+          .catch(err => console.error('Add meeting error:', err));
+      }
+    }
+
+    function handleMeetingListClick(e) {
+      const editBtn   = e.target.closest('.edit-meeting-btn');
+      const joinBtn   = e.target.closest('.join-meeting-btn');
+      const deleteBtn = e.target.closest('.delete-meeting-btn');
+      if (!editBtn && !joinBtn && !deleteBtn) return;
+
+      const id = (editBtn || joinBtn || deleteBtn).dataset.id;
+
+      if (editBtn) {
+        appState.editingMeetingId = id;
+        renderMeetings();
+      } else if (joinBtn) {
+        appState.selectedChatId = id;
+        appState.selectedChatType = 'meeting';
+        renderChat(id, 'meeting');
+      } else if (deleteBtn) {
+        if (!confirm('Delete this meeting?')) return;
+        deleteDoc(doc(db, `artifacts/${appId}/public/data/meetings`, id))
+          .catch(err => console.error('Delete meeting error:', err));
+      }
+    }
+
+    // --- Groups view ---
+    function renderGroups(filteredGroups = appState.groups, searchQuery = '') {
+      const groupToEdit = appState.editingGroupId ? appState.groups.find(g => g.id === appState.editingGroupId) : null;
+      groupsView.innerHTML = `
+        <div class="space-y-6">
+          <h2 class="text-2xl font-semibold text-white text-center">Community Groups</h2>
+          <div id="group-form" class="bg-[#1b2530] p-6 rounded-2xl shadow-inner space-y-4">
+            <h3 class="text-xl font-semibold text-gray-200">${appState.editingGroupId ? 'Edit Group' : 'Create a Group'}</h3>
+            <input id="group-name" class="form-input" type="text" placeholder="Group Name" value="${groupToEdit?.name || ''}">
+            <textarea id="group-description" class="form-input" rows="3" placeholder="Group Description">${groupToEdit?.description || ''}</textarea>
+            <button id="save-group-btn" class="form-button bg-green-600 hover:bg-green-700" data-action="${appState.editingGroupId ? 'update' : 'add'}">${appState.editingGroupId ? 'Update' : 'Create'}</button>
+            ${appState.editingGroupId ? '<button id="cancel-edit-btn" class="form-button bg-gray-600 hover:bg-gray-700">Cancel</button>' : ''}
+          </div>
+          <input id="search-groups" class="form-input" type="text" placeholder="Search groups..." value="${searchQuery}">
+          <div id="groups-list" class="space-y-4">
+            ${filteredGroups.length === 0 ? '<p class="text-gray-500 text-center mt-4">No groups available. Be the first to create one!</p>' : ''}
+          </div>
+        </div>
+      `;
+      const list = groupsView.querySelector('#groups-list');
+      filteredGroups.forEach(group => {
+        const card = document.createElement('div');
+        card.className = 'bg-[#1b2530] p-4 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center card-glow';
+        card.innerHTML = `
+          <div class="mb-2 sm:mb-0 text-center sm:text-left">
+            <h3 class="font-bold text-gray-100">${group.name}</h3>
+            <p class="text-sm text-gray-400">Description: ${group.description || ''}</p>
+          </div>
+          <div class="flex space-x-2">
+            <button data-id="${group.id}" class="action-button edit-group-btn bg-yellow-600 hover:bg-yellow-700">Edit</button>
+            <button data-id="${group.id}" class="action-button join-group-btn bg-indigo-600 hover:bg-indigo-700">Join</button>
+            <button data-id="${group.id}" class="action-button delete-group-btn bg-red-600 hover:bg-red-700">Delete</button>
+          </div>`;
+        list.appendChild(card);
+      });
+      groupsView.querySelector('#search-groups').addEventListener('input', appState.debouncedSearch);
+      groupsView.querySelector('#group-form').addEventListener('click', handleGroupFormClick);
+      groupsView.querySelector('#groups-list').addEventListener('click', handleGroupListClick);
+    }
+
+    function handleGroupFormClick(e) {
+      const btn = e.target.closest('#save-group-btn, #cancel-edit-btn');
+      if (!btn) return;
+
+      if (btn.id === 'cancel-edit-btn') {
+        appState.editingGroupId = null;
+        renderGroups();
+        return;
+      }
+
+      const name = document.getElementById('group-name').value.trim();
+      const description = document.getElementById('group-description').value.trim();
+
+      if (!name) return alert('Please enter a group name.');
+
+      const col = collection(db, `artifacts/${appId}/public/data/groups`);
+      if (btn.dataset.action === 'update' && appState.editingGroupId) {
+        const ref = doc(db, `artifacts/${appId}/public/data/groups`, appState.editingGroupId);
+        setDoc(ref, { name, description, updatedBy: appState.userId, updatedAt: Date.now() }, { merge: true })
+          .then(() => { appState.editingGroupId = null; })
+          .catch(err => console.error('Update group error:', err));
+      } else {
+        addDoc(col, { name, description, createdBy: appState.userId, createdAt: Date.now() })
+          .catch(err => console.error('Add group error:', err));
+      }
+    }
+
+    function handleGroupListClick(e) {
+      const editBtn   = e.target.closest('.edit-group-btn');
+      const joinBtn   = e.target.closest('.join-group-btn');
+      const deleteBtn = e.target.closest('.delete-group-btn');
+      if (!editBtn && !joinBtn && !deleteBtn) return;
+
+      const id = (editBtn || joinBtn || deleteBtn).dataset.id;
+
+      if (editBtn) {
+        appState.editingGroupId = id;
+        renderGroups();
+      } else if (joinBtn) {
+        appState.selectedChatId = id;
+        appState.selectedChatType = 'group';
+        renderChat(id, 'group');
+      } else if (deleteBtn) {
+        if (!confirm('Delete this group?')) return;
+        deleteDoc(doc(db, `artifacts/${appId}/public/data/groups`, id))
+          .catch(err => console.error('Delete group error:', err));
+      }
+    }
+
+    // --- Chat view ---
+    function renderChat(chatId, type) {
+      chatView.innerHTML = `
+        <div class="p-6 bg-[#1b2530] rounded-2xl shadow-lg h-[80vh] flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <button id="back-to-list-btn" class="text-indigo-400 hover:text-indigo-300 transition-colors">
+              <svg class="h-6 w-6 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+              </svg>Back
+            </button>
+            <h2 class="text-2xl font-bold text-white">${
+              type === 'meeting'
+                ? (appState.meetings.find(m => m.id === chatId)?.title || 'Meeting')
+                : (appState.groups.find(g => g.id === chatId)?.name || 'Group')
+            }</h2>
+          </div>
+          <div id="chat-messages" class="flex-grow overflow-y-auto bg-[#0d1117] p-4 rounded-xl space-y-4 chat-scroll">
+            <div class="text-center text-gray-500">No messages yet. Say hello!</div>
+          </div>
+          <div class="mt-4 flex space-x-2">
+            <input id="new-message" class="flex-grow p-3 bg-gray-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" type="text" placeholder="Type a message...">
+            <button id="send-message-btn" class="bg-indigo-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:bg-indigo-700 transition duration-300">
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.01 6.03l7.5 3.55-7.5 3.54L4.01 18l17.99-6L4.01 6.03z"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+      showView('chat');
+
+      const chatMessagesEl = chatView.querySelector('#chat-messages');
+      const newMessageEl   = chatView.querySelector('#new-message');
+      const sendMessageBtn = chatView.querySelector('#send-message-btn');
+
+      const path = `

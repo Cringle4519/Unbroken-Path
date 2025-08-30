@@ -1,133 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
-
-function Home() {
-  return (
-    <div style={{ padding: "1rem" }}>
-      <h2>Welcome</h2>
-      <p>This is your working site. Use the links above to navigate.</p>
-    </div>
-  );
-}
-
-function Groups() {
-  const demo = [
-    { id: "recovery-mens", name: "Recovery • Men", members: 42 },
-    { id: "dv-survivors", name: "DV Survivors Circle", members: 18 },
-    { id: "youth-anti-bullying", name: "Youth Anti-Bullying", members: 33 },
-  ];
-  return (
-    <div style={{ padding: "1rem" }}>
-      <h2>Groups</h2>
-      <div style={{ display: "grid", gap: 12 }}>
-        {demo.map(g => (
-          <div key={g.id} style={{ padding: 12, border: "1px solid #ddd", borderRadius: 8 }}>
-            <strong>{g.name}</strong>
-            <div style={{ color: "#666" }}>{g.members} members</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Meetings() {
-  const [items, setItems] = useState([
-    { id: 1, title: "NA Weekly", when: "Wed 7:00 PM", where: "Downtown STL" },
-    { id: 2, title: "DV Survivors Circle", when: "Thu 6:00 PM", where: "Uptown Center" },
-  ]);
-  function add(e) {
-    e.preventDefault();
-    const f = e.target;
-    const title = f.title.value.trim();
-    if (!title) return;
-    setItems(prev => [...prev, { id: Date.now(), title, when: f.when.value, where: f.where.value }]);
-    f.reset();
-  }
-  return (
-    <div style={{ padding: "1rem", display: "grid", gap: 16 }}>
-      <h2>Meetings</h2>
-      <div>
-        {items.map(m => (
-          <div key={m.id} style={{ padding: 10, borderBottom: "1px solid #eee" }}>
-            <strong>{m.title}</strong> — <span>{m.when}</span> • <span>{m.where}</span>
-          </div>
-        ))}
-      </div>
-      <form onSubmit={add} style={{ display: "grid", gap: 8, maxWidth: 380 }}>
-        <input name="title" placeholder="Title" style={inp} />
-        <input name="when" placeholder="When" style={inp} />
-        <input name="where" placeholder="Where" style={inp} />
-        <button style={btn}>Add</button>
-      </form>
-    </div>
-  );
-}
-
-function Profile() {
-  const [email, setEmail] = useState(localStorage.getItem("up_email") || "");
-  function save(e) {
-    e.preventDefault();
-    const v = e.target.email.value.trim();
-    setEmail(v);
-    localStorage.setItem("up_email", v);
-  }
-  return (
-    <div style={{ padding: "1rem", display: "grid", gap: 12, maxWidth: 420 }}>
-      <h2>Profile</h2>
-      <form onSubmit={save} style={{ display: "grid", gap: 8 }}>
-        <input name="email" defaultValue={email} placeholder="email@example.com" style={inp} />
-        <button style={btn}>Save</button>
-      </form>
-      {email ? <span style={{ color: "#118a3b" }}>Saved as: {email}</span> : null}
-    </div>
-  );
-}
-
-const inp = { padding: "10px", borderRadius: 8, border: "1px solid #ddd" };
-const btn = { padding: "10px 14px", borderRadius: 8, border: "none", background: "#22c55e", color: "#053116", fontWeight: 700, cursor: "pointer" };
+import "./index.css";
 
 function App() {
-  const [route, setRoute] = useState(window.location.hash || "#/");
-
-  useEffect(() => {
-    const onHash = () => setRoute(window.location.hash || "#/");
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
-
   return (
-    <div style={{ padding: "2rem", fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" }}>
+    <div style={{ padding: "2rem", fontFamily: "system-ui" }}>
       <h1>Unbroken Path</h1>
-      <nav style={{ margin: "1rem 0", display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <a href="#/" style={link(route, "#/")}>Home</a>
-        <a href="#/groups" style={link(route, "#/groups")}>Groups</a>
-        <a href="#/meetings" style={link(route, "#/meetings")}>Meetings</a>
-        <a href="#/profile" style={link(route, "#/profile")}>Profile</a>
-      </nav>
-
-      {route === "#/" && <Home />}
-      {route === "#/groups" && <Groups />}
-      {route === "#/meetings" && <Meetings />}
-      {route === "#/profile" && <Profile />}
-
-      {!["#/", "#/groups", "#/meetings", "#/profile"].includes(route) && (
-        <div><h3>404</h3><a href="#/">Go Home</a></div>
-      )}
+      <p>✅ If you see this, your site is working. No blank page.</p>
     </div>
   );
-}
-
-function link(current, target) {
-  const active = current === target;
-  return {
-    padding: "8px 12px",
-    borderRadius: 10,
-    border: "1px solid #ddd",
-    background: active ? "#eef2ff" : "#fff",
-  };
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode><App /></React.StrictMode>
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
 );

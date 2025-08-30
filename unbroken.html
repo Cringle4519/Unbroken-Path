@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Unbroken Path — It Works</title>
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0f172a;color:#e5e7eb}
+    .wrap{max-width:900px;margin:0 auto;padding:24px}
+    .card{background:#111827;border:1px solid #1f2937;border-radius:16px;padding:18px}
+    .btn{display:inline-block;margin-top:12px;padding:10px 14px;border-radius:10px;background:#22c55e;color:#052e16;font-weight:700;border:none;cursor:pointer}
+    .nav a{display:inline-block;margin:6px 8px 0 0;padding:8px 12px;border-radius:10px;border:1px solid #1f2937;background:#0b1224;color:#93c5fd;text-decoration:none}
+    .muted{color:#94a3b8;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Unbroken Path</h1>
+    <div class="nav">
+      <a href="#/">Home</a>
+      <a href="#/groups">Groups</a>
+      <a href="#/meetings">Meetings</a>
+      <a href="#/profile">Profile</a>
+    </div>
+
+    <div id="root" class="card" style="margin-top:12px;"></div>
+    <p class="muted">This file is pure HTML+JS. No build. If you see this, your page works.</p>
+  </div>
+
+  <script>
+    // Minimal local router with working content—no frameworks needed
+    const $ = s => document.querySelector(s);
+    const S = {
+      email: localStorage.getItem('up_email') || '',
+      meetings: [{t:'NA Weekly', w:'Wed 7:00 PM', where:'Downtown STL'}],
+      groups: [
+        {id:'recovery-mens', name:'Recovery • Men', members:42},
+        {id:'dv-survivors', name:'DV Survivors Circle', members:18},
+        {id:'youth-anti-bullying', name:'Youth Anti-Bullying', members:33},
+      ]
+    };
+    function render(){
+      const h = location.hash || '#/';
+      const root = $('#root');
+      if(h==='#/'||h===''){
+        root.innerHTML = `
+          <h2>Welcome</h2>
+          <p>This is a real, working page (no blank). Click the tabs above.</p>
+          <button class="btn" onclick="location.hash='#/groups'">Go to Groups</button>
+        `;
+      }else if(h==='#/groups'){
+        root.innerHTML = `
+          <h2>Groups</h2>
+          ${S.groups.map(g=>`
+            <div style="padding:8px 0;border-bottom:1px solid #1f2937">
+              <strong>${g.name}</strong> • <span class="muted">${g.members} members</span>
+            </div>`).join('')}
+        `;
+      }else if(h==='#/meetings'){
+        root.innerHTML = `
+          <h2>Meetings</h2>
+          <div id="list">${S.meetings.map(m=>`
+            <div style="padding:8px 0;border-bottom:1px solid #1f2937">
+              <strong>${m.t}</strong> — ${m.w} • ${m.where}
+            </div>`).join('')}
+          </div>
+          <form onsubmit="addMeeting(event)" style="display:grid;gap:8;max-width:360px;margin-top:10px">
+            <input name="t" placeholder="Title" style="padding:10px;border-radius:10px;border:1px solid #1f2937;background:#0b1224;color:#e5e7eb">
+            <input name="w" placeholder="When"  style="padding:10px;border-radius:10px;border:1px solid #1f2937;background:#0b1224;color:#e5e7eb">
+            <input name="where" placeholder="Where" style="padding:10px;border-radius:10px;border:1px solid #1f2937;background:#0b1224;color:#e5e7eb">
+            <button class="btn">Add</button>
+          </form>
+        `;
+      }else if(h==='#/profile'){
+        root.innerHTML = `
+          <h2>Profile</h2>
+          <form onsubmit="saveEmail(event)" style="display:grid;gap:8;max-width:360px">
+            <input name="email" value="${S.email}" placeholder="email@example.com"
+              style="padding:10px;border-radius:10px;border:1px solid #1f2937;background:#0b1224;color:#e5e7eb">
+            <button class="btn">Save</button>
+          </form>
+          ${S.email ? `<p class="muted">Saved as: ${S.email}</p>` : ''}
+        `;
+      }else{
+        root.innerHTML = `<h2>404</h2><button class="btn" onclick="location.hash='#/'">Go Home</button>`;
+      }
+    }
+    function addMeeting(e){
+      e.preventDefault();
+      const f=e.target;
+      const m={t:f.t.value.trim(), w:f.w.value.trim(), where:f.where.value.trim()};
+      if(!m.t) return;
+      S.meetings.push(m);
+      f.reset();
+      location.hash = '#/meetings';
+      render();
+    }
+    function saveEmail(e){
+      e.preventDefault();
+      const v = e.target.email.value.trim();
+      S.email = v; localStorage.setItem('up_email', v);
+      render();
+    }
+    window.addEventListener('hashchange', render);
+    window.addEventListener('load', render);
+  </script>
+</body>
+</html>

@@ -358,8 +358,21 @@
       const chatMessagesEl = chatView.querySelector('#chat-messages');
       const newMessageEl   = chatView.querySelector('#new-message');
       const sendMessageBtn = chatView.querySelector('#send-message-btn');
+// --- Firebase Config ---
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-      const path = `
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+      
 </script>
   </body>
 </html>

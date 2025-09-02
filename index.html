@@ -94,7 +94,16 @@
     const profileView  = document.getElementById('profile-view');
     const chatView     = document.getElementById('chat-view');
     const loadingDiv   = document.getElementById('loading');
-
+// real Firebase config 
+const firebaseConfig = {
+  apiKey: "AIzaSyC3Ga-GhV8xQztnbef7ybPFu4BRtLANtuk",
+  authDomain: "unbrokenpath-630b0.firebaseapp.com",
+  projectId: "unbrokenpath-630b0",
+  storageBucket: "unbrokenpath-630b0.appspot.com", // corrected domain
+  messagingSenderId: "147188865145",
+  appId: "1:147188865145:web:ff1f35a732bf89b31e1ca8",
+  measurementId: "G-0Y8G7SS1BV"
+};
     // App state
     const appState = {
       userId: null,
